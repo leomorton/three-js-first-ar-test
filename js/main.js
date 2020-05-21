@@ -11,6 +11,7 @@ let hitTestSource = null;
 let hitTestSourceRequested = false;
 
 init();
+animate();
 
 function init() {
     canvasElem = document.querySelector('#c');
@@ -129,4 +130,5 @@ function render(timestamp, frame) {
             }
         }
     }
+    renderer.render(scene, camera);
 }
