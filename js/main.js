@@ -100,7 +100,7 @@ function init() {
                 pot.setFromtMatrixPosition(reticle.matrix);
                 scene.add(pot);
             }
-            /*
+
             const material = new THREE.MeshPhongMaterial({
                 color: 0xffffff * Math.random(),
             });
@@ -108,7 +108,6 @@ function init() {
             mesh.position.setFromMatrixPosition(reticle.matrix);
             mesh.scale.y = Math.random() * 2 + 1;
             scene.add(mesh);
-            */
         }
     }
 
