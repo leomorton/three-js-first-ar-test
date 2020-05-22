@@ -82,25 +82,22 @@ function init() {
             });
             mesh.material = phongMaterial;
         }
-        scene.add(gltf.scene);
         potNoodle = gltf.scene;
         potLoaded = true;
     }
 
-    const boxWidth = 0.2;
-    const boxHeight = 0.2;
-    const boxDepth = 0.2;
+    const boxWidth = 0.5;
+    const boxHeight = 0.5;
+    const boxDepth = 0.5;
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     function onSelect() {
         if (reticle.visible) {
-            console.log(reticle.matrix);
             if (potLoaded) {
                 const pot = potNoodle.clone();
-                pot.setFromtMatrixPosition(reticle.matrix);
+                pot.position.setFromMatrixPosition(reticle.matrix);
                 scene.add(pot);
             }
-
             const material = new THREE.MeshPhongMaterial({
                 color: 0xffffff * Math.random(),
             });
