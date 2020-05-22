@@ -59,8 +59,7 @@ function init() {
     // geometry
 
     const loader = new GLTFLoader();
-    let path =
-        'https://github.com/leomorton/three-js-first-ar-test/blob/master/assets/models/potNoodle.glb';
+    let path = './assets/models/potNoodle.glb';
 
     console.log(path);
     loader.load(
