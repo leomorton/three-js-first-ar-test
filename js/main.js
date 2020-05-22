@@ -63,9 +63,7 @@ function init() {
     loader.load(
         '../assets/models/potNoodle.glb',
         (gltf) => {
-            //potLoaded(gltf);
-            scene.add(gltf.scene);
-            potNoodle = gltf.scene;
+            potLoaded(gltf);
         },
         undefined,
         function (error) {
@@ -96,8 +94,11 @@ function init() {
 
     function onSelect() {
         if (reticle.visible) {
+            console.log(reticle.matrix);
             if (potLoaded) {
-                scene.add(potNoodle);
+                const pot = potNoodle.clone();
+                pot.setFromtMatrixPosition(reticle.matrix);
+                scene.add(pot);
             }
             /*
             const material = new THREE.MeshPhongMaterial({
