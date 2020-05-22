@@ -8,6 +8,7 @@ let controller;
 
 let reticle;
 
+let potLoaded = false;
 let potNoodle;
 
 let hitTestSource = null;
@@ -75,8 +76,15 @@ function init() {
         for (const mesh of gltf.scene.children) {
             mesh.scale.x = 0.05;
             mesh.scale.y = 0.05;
+            mesh.position.z = -4;
+            const phongMaterial = new THREE.MeshPhongMaterial({
+                color: 0x555555,
+            });
+            mesh.material = phongMaterial;
         }
+        scene.add(gltf.scene);
         potNoodle = gltf.scene;
+        potLoaded = true;
     }
 
     const boxWidth = 0.2;
@@ -86,6 +94,9 @@ function init() {
 
     function onSelect() {
         if (reticle.visible) {
+            if (potLoaded) {
+                scene.add(potNoodle);
+            }
             /*
             const material = new THREE.MeshPhongMaterial({
                 color: 0xffffff * Math.random(),
@@ -95,7 +106,6 @@ function init() {
             mesh.scale.y = Math.random() * 2 + 1;
             scene.add(mesh);
             */
-            scene.add(potNoodle);
         }
     }
 
