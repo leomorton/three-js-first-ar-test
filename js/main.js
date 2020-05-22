@@ -59,9 +59,11 @@ function init() {
     // geometry
 
     const loader = new GLTFLoader();
+    let path = './assets/models/potNoodle.glb';
 
+    console.log(path);
     loader.load(
-        '../assets/models/potNoodle.glb',
+        path,
         (gltf) => {
             potLoaded(gltf);
         },
