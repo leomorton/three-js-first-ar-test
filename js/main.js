@@ -62,8 +62,10 @@ function init() {
 
     loader.load(
         '../assets/models/potNoodle.glb',
-        function (gltf) {
-            potLoaded(gltf);
+        (gltf) => {
+            //potLoaded(gltf);
+            scene.add(gltf.scene);
+            potNoodle = gltf.scene;
         },
         undefined,
         function (error) {
