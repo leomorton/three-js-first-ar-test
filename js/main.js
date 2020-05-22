@@ -1,12 +1,14 @@
-import * as THREE from './three.module.js';
-import { ARButton } from './ARButton.js';
-import { GLTFLoader } from './GLTFLoader.js';
+import * as THREE from './three/build/three.module.js';
+import { ARButton } from './three/examples/jsm/webxr/ARButton.js';
+import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 
 let canvasElem;
 let camera, scene, renderer;
 let controller;
 
 let reticle;
+
+let potNoodle;
 
 let hitTestSource = null;
 let hitTestSourceRequested = false;
@@ -55,18 +57,27 @@ function init() {
 
     // geometry
 
-    const loader = new THREE.GLTFLoader();
+    const loader = new GLTFLoader();
 
     loader.load(
         '../assets/models/potNoodle.glb',
         function (gltf) {
-            scene.add(gltf.scene);
+            potLoaded(gltf);
         },
         undefined,
         function (error) {
             console.error(error);
         }
     );
+
+    function potLoaded(gltf) {
+        console.log(gltf.scene);
+        for (const mesh of gltf.scene.children) {
+            mesh.scale.x = 0.05;
+            mesh.scale.y = 0.05;
+        }
+        potNoodle = gltf.scene;
+    }
 
     const boxWidth = 0.2;
     const boxHeight = 0.2;
@@ -75,6 +86,7 @@ function init() {
 
     function onSelect() {
         if (reticle.visible) {
+            /*
             const material = new THREE.MeshPhongMaterial({
                 color: 0xffffff * Math.random(),
             });
@@ -82,6 +94,8 @@ function init() {
             mesh.position.setFromMatrixPosition(reticle.matrix);
             mesh.scale.y = Math.random() * 2 + 1;
             scene.add(mesh);
+            */
+            scene.add(potNoodle);
         }
     }
 
