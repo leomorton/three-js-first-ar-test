@@ -8,11 +8,14 @@ let controller;
 
 let reticle;
 
-let potLoaded = false;
+let modelLoaded = false;
 let potNoodle;
 
 let hitTestSource = null;
 let hitTestSourceRequested = false;
+
+let animMixer;
+let clock;
 
 init();
 animate();
@@ -74,39 +77,38 @@ function init() {
     );
 
     function potLoaded(gltf) {
-        console.log(gltf.scene);
-        for (const mesh of gltf.scene.children) {
-            mesh.scale.x = 0.05;
-            mesh.scale.y = 0.05;
-            mesh.position.z = -4;
-            const phongMaterial = new THREE.MeshPhongMaterial({
-                color: 0x555555,
-            });
-            mesh.material = phongMaterial;
+        potNoodle = gltf;
+        for (const mesh of potNoodle.scene.children) {
+            mesh.scale.x = 0.5;
+            mesh.scale.y = 0.5;
+            mesh.scale.z = 0.5;
         }
-        potNoodle = gltf.scene;
-        potLoaded = true;
+        scene.add(potNoodle.scene);
+        modelLoaded = true;
+
+        let lid = potNoodle.scene.children[1];
+        animMixer = new THREE.AnimationMixer(lid);
+
+        let animationClip = animMixer.clipAction(potNoodle.animations[0]);
+        //animation.setLoop(THREE.LoopOnce);
+        //animation.clampWhenFinished = true;
+        animationClip.play();
+
+        clock = new THREE.Clock();
     }
 
-    const boxWidth = 0.5;
-    const boxHeight = 0.5;
-    const boxDepth = 0.5;
-    const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-
+    // HEY HEY HEY try just creating one pot noodle and then playing the animation
     function onSelect() {
         if (reticle.visible) {
-            if (potLoaded) {
-                const pot = potNoodle.clone();
-                pot.position.setFromMatrixPosition(reticle.matrix);
-                scene.add(pot);
+            if (modelLoaded) {
+                potNoodle.scene.position.setFromMatrixPosition(reticle.matrix);
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0xffffff * Math.random(),
+                });
+                for (const mesh of potNoodle.scene.children) {
+                    mesh.material = material;
+                }
             }
-            const material = new THREE.MeshPhongMaterial({
-                color: 0xffffff * Math.random(),
-            });
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.position.setFromMatrixPosition(reticle.matrix);
-            mesh.scale.y = Math.random() * 2 + 1;
-            scene.add(mesh);
         }
     }
 
@@ -172,6 +174,12 @@ function render(timestamp, frame) {
                 );
             } else {
                 reticle.visible = false;
+            }
+        }
+        if (clock) {
+            let delta = clock.getDelta();
+            if (animMixer) {
+                animMixer.update(delta);
             }
         }
     }
