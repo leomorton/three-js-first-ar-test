@@ -1,5 +1,6 @@
 import * as THREE from './three.module.js';
 import { ARButton } from './ARButton.js';
+import { GLTFLoader } from './GLTFLoader.js';
 
 let canvasElem;
 let camera, scene, renderer;
@@ -14,7 +15,11 @@ init();
 animate();
 
 function init() {
+    // canvas
+
     canvasElem = document.querySelector('#c');
+
+    // scene setup
 
     scene = new THREE.Scene();
 
@@ -31,6 +36,8 @@ function init() {
     light.position.set(0.5, 1, 0.25);
     scene.add(light);
 
+    // renderer
+
     renderer = new THREE.WebGLRenderer({
         canvas: canvasElem,
         antialias: true,
@@ -40,17 +47,30 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
 
-    //
+    // add button
 
     document.body.appendChild(
         ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] })
     );
 
-    //geometry
+    // geometry
 
-    const boxWidth = 1;
-    const boxHeight = 1;
-    const boxDepth = 1;
+    const loader = new THREE.GLTFLoader();
+
+    loader.load(
+        '../assets/models/potNoodle.glb',
+        function (gltf) {
+            scene.add(gltf.scene);
+        },
+        undefined,
+        function (error) {
+            console.error(error);
+        }
+    );
+
+    const boxWidth = 0.2;
+    const boxHeight = 0.2;
+    const boxDepth = 0.2;
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     function onSelect() {
