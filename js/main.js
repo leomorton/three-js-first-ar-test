@@ -12,8 +12,14 @@ let potScene;
 let mixer;
 let clips;
 
+let potPlaced;
+
 let hitTestSource = null;
 let hitTestSourceRequested = false;
+
+let camPos = new THREE.Vector3();
+let camScale = new THREE.Vector3();
+let camRot = new THREE.Quaternion();
 
 init();
 animate();
@@ -64,7 +70,6 @@ function init() {
 
     loader.load(path, (gltf) => {
         potScene = gltf.scene;
-        console.log(potScene);
         for (const mesh of potScene.children) {
             mesh.scale.set(0.5, 0.5, 0.5);
         }
@@ -73,13 +78,48 @@ function init() {
         potScene.position.y = -1;
         scene.add(potScene);
 
-        console.log(gltf.animations);
+        //materials
+        const c_green = new THREE.Color(0x0da335);
+        const c_red = new THREE.Color(0xc20906);
+
+        const c_noodle = new THREE.Color(0xcf9a17);
+
+        const c_PotGreen = new THREE.Color(0x00db28);
+        const c_PotWhite = new THREE.Color(0xffffff);
+
+        const c_yellow = new THREE.Color(0xffaa00);
+        const c_grey = new THREE.Color(0xdddddd);
+
+        console.log(potScene.children);
+        //stars
+        potScene.children[0].children[0].material.color = c_green;
+        potScene.children[0].children[1].material.color = c_green;
+        potScene.children[0].children[2].material.color = c_green;
+        potScene.children[0].children[3].material.color = c_red;
+        potScene.children[0].children[4].material.color = c_red;
+
+        //noodles
+        potScene.children[0].children[5].material.color = c_noodle;
+        potScene.children[0].children[6].material.color = c_noodle;
+        potScene.children[0].children[7].material.color = c_noodle;
+
+        //button / pot
+        potScene.children[1].children[0].children[0].material.color = c_PotWhite;
+        potScene.children[1].children[0].children[0].material.shininess = 0;
+
+        potScene.children[1].children[0].children[1].material.color = c_PotGreen;
+        potScene.children[1].children[0].children[2].material.color = c_yellow;
+
+        //lid
+        potScene.children[3].children[0].material.color = c_grey;
+        potScene.children[3].children[1].material.color = c_PotGreen;
 
         mixer = new THREE.AnimationMixer(potScene);
         clips = gltf.animations;
 
         for (const clip of clips) {
             let anim = mixer.clipAction(clip);
+            anim.timeScale = 2;
             anim.setLoop(THREE.LoopOnce);
             anim.clampWhenFinished = true;
         }
@@ -88,15 +128,23 @@ function init() {
     function onSelect() {
         if (reticle.visible) {
             if (potScene) {
-                potScene.position.setFromMatrixPosition(reticle.matrix);
-                //console.log(camera.getWorldDirection());
-                potScene.lookAt(camera.getWorldPosition());
+                if (!potPlaced) {
+                    potScene.position.setFromMatrixPosition(reticle.matrix);
+                    potPlaced = true;
+                } else {
+                    for (const clip of clips) {
+                        mixer.clipAction(clip).stop();
+                        mixer.clipAction(clip).play();
+                    }
+                }
+
+                camera.matrixWorld.decompose(camPos, camRot, camScale);
+                let camRotEuler = new THREE.Euler().setFromQuaternion(camRot);
+                potScene.lookAt(camPos);
+                //potScene.rotation.y = camRotEuler.y * -1 + 1;
+                console.log(potScene.rotation.y);
                 potScene.rotation.x = 0;
                 potScene.rotation.z = 0;
-                for (const clip of clips) {
-                    mixer.clipAction(clip).stop();
-                    mixer.clipAction(clip).play();
-                }
             }
         }
     }
