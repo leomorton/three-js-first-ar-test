@@ -8,14 +8,12 @@ let controller;
 
 let reticle;
 
-let modelLoaded = false;
-let potNoodle;
+let pot;
+let mixer;
+let animation;
 
 let hitTestSource = null;
 let hitTestSourceRequested = false;
-
-let animMixer;
-let clock;
 
 init();
 animate();
@@ -64,50 +62,36 @@ function init() {
     const loader = new GLTFLoader();
     let path = './assets/models/potNoodle.glb';
 
-    console.log(path);
-    loader.load(
-        path,
-        (gltf) => {
-            potLoaded(gltf);
-        },
-        undefined,
-        function (error) {
-            console.error(error);
+    loader.load(path, (gltf) => {
+        pot = gltf.scene;
+
+        const material = new THREE.MeshPhongMaterial({
+            color: 0xcccccc,
+            morphTargets: true,
+        });
+        for (const mesh of pot.children) {
+            mesh.scale.set(0.5, 0.5, 0.5);
+            mesh.material = material;
         }
-    );
 
-    function potLoaded(gltf) {
-        potNoodle = gltf;
-        for (const mesh of potNoodle.scene.children) {
-            mesh.scale.x = 0.5;
-            mesh.scale.y = 0.5;
-            mesh.scale.z = 0.5;
-        }
-        scene.add(potNoodle.scene);
-        modelLoaded = true;
+        pot.position.z = -10;
+        scene.add(pot);
 
-        let lid = potNoodle.scene.children[1];
-        animMixer = new THREE.AnimationMixer(lid);
+        let lid = pot.children[1];
 
-        let animationClip = animMixer.clipAction(potNoodle.animations[0]);
-        //animation.setLoop(THREE.LoopOnce);
-        //animation.clampWhenFinished = true;
-        animationClip.play();
+        mixer = new THREE.AnimationMixer(lid);
+        animation = mixer.clipAction(gltf.animations[0]);
+        animation.setLoop(THREE.LoopOnce);
+        animation.clampWhenFinished = true;
+        animation.setDuration(1).play();
+    });
 
-        clock = new THREE.Clock();
-    }
-
-    // HEY HEY HEY try just creating one pot noodle and then playing the animation
     function onSelect() {
         if (reticle.visible) {
-            if (modelLoaded) {
-                potNoodle.scene.position.setFromMatrixPosition(reticle.matrix);
-                const material = new THREE.MeshPhongMaterial({
-                    color: 0xffffff * Math.random(),
-                });
-                for (const mesh of potNoodle.scene.children) {
-                    mesh.material = material;
-                }
+            if (pot) {
+                pot.position.setFromMatrixPosition(reticle.matrix);
+                animation.stop();
+                animation.play();
             }
         }
     }
@@ -138,7 +122,17 @@ function animate() {
     renderer.setAnimationLoop(render);
 }
 
+let prevTime = Date.now();
+
 function render(timestamp, frame) {
+    if (pot) {
+        let timer = Date.now();
+
+        mixer.update((timer - prevTime) * 0.0003);
+
+        prevTime = timer;
+    }
+
     if (frame) {
         const referenceSpace = renderer.xr.getReferenceSpace();
         const session = renderer.xr.getSession();
@@ -174,12 +168,6 @@ function render(timestamp, frame) {
                 );
             } else {
                 reticle.visible = false;
-            }
-        }
-        if (clock) {
-            let delta = clock.getDelta();
-            if (animMixer) {
-                animMixer.update(delta);
             }
         }
     }
