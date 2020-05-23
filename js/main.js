@@ -8,9 +8,9 @@ let controller;
 
 let reticle;
 
-let pot;
+let potScene;
 let mixer;
-let animation;
+let clips;
 
 let hitTestSource = null;
 let hitTestSourceRequested = false;
@@ -60,38 +60,43 @@ function init() {
     // geometry
 
     const loader = new GLTFLoader();
-    let path = './assets/models/potNoodle.glb';
+    let path = './assets/models/potNoodle_Anim.glb';
 
     loader.load(path, (gltf) => {
-        pot = gltf.scene;
-
-        const material = new THREE.MeshPhongMaterial({
-            color: 0xcccccc,
-            morphTargets: true,
-        });
-        for (const mesh of pot.children) {
+        potScene = gltf.scene;
+        console.log(potScene);
+        for (const mesh of potScene.children) {
             mesh.scale.set(0.5, 0.5, 0.5);
-            mesh.material = material;
         }
 
-        pot.position.z = -10;
-        scene.add(pot);
+        potScene.position.z = -4;
+        potScene.position.y = -1;
+        scene.add(potScene);
 
-        let lid = pot.children[1];
+        console.log(gltf.animations);
 
-        mixer = new THREE.AnimationMixer(lid);
-        animation = mixer.clipAction(gltf.animations[0]);
-        animation.setLoop(THREE.LoopOnce);
-        animation.clampWhenFinished = true;
-        animation.setDuration(1).play();
+        mixer = new THREE.AnimationMixer(potScene);
+        clips = gltf.animations;
+
+        for (const clip of clips) {
+            let anim = mixer.clipAction(clip);
+            anim.setLoop(THREE.LoopOnce);
+            anim.clampWhenFinished = true;
+        }
     });
 
     function onSelect() {
         if (reticle.visible) {
-            if (pot) {
-                pot.position.setFromMatrixPosition(reticle.matrix);
-                animation.stop();
-                animation.play();
+            if (potScene) {
+                potScene.position.setFromMatrixPosition(reticle.matrix);
+                //console.log(camera.getWorldDirection());
+                potScene.lookAt(camera.getWorldPosition());
+                potScene.rotation.x = 0;
+                potScene.rotation.z = 0;
+                for (const clip of clips) {
+                    mixer.clipAction(clip).stop();
+                    mixer.clipAction(clip).play();
+                }
             }
         }
     }
@@ -125,7 +130,7 @@ function animate() {
 let prevTime = Date.now();
 
 function render(timestamp, frame) {
-    if (pot) {
+    if (potScene) {
         let timer = Date.now();
 
         mixer.update((timer - prevTime) * 0.0003);
