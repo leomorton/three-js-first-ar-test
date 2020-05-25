@@ -37,8 +37,8 @@ var ARButton = {
             button.style.display = '';
 
             button.style.cursor = 'pointer';
-            button.style.left = 'calc(50% - 50px)';
-            button.style.width = '100px';
+            button.style.left = 'calc(50% - 100px)';
+            button.style.width = '200px';
 
             button.textContent = 'START AR';
 
@@ -47,7 +47,7 @@ var ARButton = {
             };
 
             button.onmouseleave = function () {
-                button.style.opacity = '0.5';
+                button.style.opacity = '0.7';
             };
 
             button.onclick = function () {
@@ -82,15 +82,15 @@ var ARButton = {
 
         function stylizeElement(element) {
             element.style.position = 'absolute';
-            element.style.bottom = '20px';
+            element.style.bottom = '20%';
             element.style.padding = '12px 6px';
-            element.style.border = '1px solid #fff';
-            element.style.borderRadius = '4px';
-            element.style.background = 'rgba(0,0,0,0.1)';
-            element.style.color = '#fff';
+            element.style.border = '5px solid #fff';
+            element.style.borderRadius = '20px';
+            element.style.background = 'rgba(255,255,255,0.15)';
+            element.style.color = '#ffffff';
             element.style.font = 'normal 13px sans-serif';
             element.style.textAlign = 'center';
-            element.style.opacity = '0.5';
+            element.style.opacity = '0.7';
             element.style.outline = 'none';
             element.style.zIndex = '999';
         }
