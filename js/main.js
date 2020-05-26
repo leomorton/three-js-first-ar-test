@@ -60,7 +60,11 @@ function init() {
     // add button
 
     document.body.appendChild(
-        ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] })
+        ARButton.createButton(
+            renderer,
+            { requiredFeatures: ['hit-test'] },
+            arStart
+        )
     );
 
     // geometry
@@ -71,7 +75,7 @@ function init() {
     loader.load(path, (gltf) => {
         potScene = gltf.scene;
         for (const mesh of potScene.children) {
-            mesh.scale.set(0.5, 0.5, 0.5);
+            mesh.scale.set(0.3, 0.3, 0.3);
         }
 
         potScene.position.z = -4;
@@ -130,6 +134,7 @@ function init() {
             if (potScene) {
                 if (!potPlaced) {
                     potScene.position.setFromMatrixPosition(reticle.matrix);
+                    potScene.scale.set(1, 1, 1);
                     potPlaced = true;
                 } else {
                     for (const clip of clips) {
@@ -138,6 +143,7 @@ function init() {
                     }
                 }
 
+                /*
                 camera.matrixWorld.decompose(camPos, camRot, camScale);
                 let camRotEuler = new THREE.Euler().setFromQuaternion(camRot);
                 potScene.lookAt(camPos);
@@ -145,8 +151,14 @@ function init() {
                 console.log(potScene.rotation.y);
                 potScene.rotation.x = 0;
                 potScene.rotation.z = 0;
+                */
             }
         }
+    }
+
+    function arStart() {
+        console.log('start session callback');
+        potScene.scale.set(0, 0, 0);
     }
 
     controller = renderer.xr.getController(0);
