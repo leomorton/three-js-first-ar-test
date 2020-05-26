@@ -135,6 +135,7 @@ function init() {
                 if (!potPlaced) {
                     potScene.position.setFromMatrixPosition(reticle.matrix);
                     potScene.scale.set(1, 1, 1);
+                    potScene.rotation.y -= Math.PI / 2;
                     potPlaced = true;
                 } else {
                     for (const clip of clips) {
@@ -147,7 +148,7 @@ function init() {
                 camera.matrixWorld.decompose(camPos, camRot, camScale);
                 let camRotEuler = new THREE.Euler().setFromQuaternion(camRot);
                 potScene.lookAt(camPos);
-                //potScene.rotation.y = camRotEuler.y * -1 + 1;
+                
                 console.log(potScene.rotation.y);
                 potScene.rotation.x = 0;
                 potScene.rotation.z = 0;
